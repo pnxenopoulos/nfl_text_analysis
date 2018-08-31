@@ -93,11 +93,11 @@ def get_player_text(player_data):
 	@param DataFrame player_data: A data frame containing basic player info like ids and year
 	'''
 	for index, row in player_data.iterrows():
-		print("Retrieving data for {0} {1} in {3}...".format(player_fn, player_ln, player_year))
 		player_year = row['year']
 		player_fn = row['first_name']
 		player_ln = row['last_name']
 		player_id = row['player_id']
+		print("Retrieving data for {0} {1} in {3}...".format(player_fn, player_ln, player_year))
 		url = "http://www.nfl.com/draft/{0}/profiles/{1}-{2}?id={3}".format(player_year, player_fn, player_ln, player_id)
 		raw_html = get_page(url)
 		html = BeautifulSoup(raw_html, 'html.parser')
