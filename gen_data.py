@@ -92,18 +92,24 @@ def get_player_text(player_data):
 	''' Function to get the player textual data
 	@param DataFrame player_data: A data frame containing basic player info like ids and year
 	'''
+	strengths = []
+	weaknesses = []
 	for index, row in player_data.iterrows():
 		player_year = row['year']
 		player_fn = row['first_name']
 		player_ln = row['last_name']
 		player_id = row['player_id']
-		print("Retrieving data for {0} {1} in {3}...".format(player_fn, player_ln, player_year))
+		print("Retrieving data for {0} {1} in {2}...".format(player_fn, player_ln, player_year))
 		url = "http://www.nfl.com/draft/{0}/profiles/{1}-{2}?id={3}".format(player_year, player_fn, player_ln, player_id)
 		raw_html = get_page(url)
 		html = BeautifulSoup(raw_html, 'html.parser')
-		article_nodes = html.select('article')	
-	return article_nodes
+		article_nodes = str(html.select('article'))
+		strengths.append(re.findall(r'</h4>(.*)',article_nodes[0]))
+		weaknesses.append(re.findall(r'</h4>(.*)',article_nodes[1]))
+	player_data['strengths'] = strengths
+	palyer_data['weaknesses'] = weaknesses
+	return player_data
 
 script_nodes = get_script_nodes()
 player_data = write_player_df(script_nodes)
-test = get_player_text(player_data)
+player_data = get_player_text(player_data)
