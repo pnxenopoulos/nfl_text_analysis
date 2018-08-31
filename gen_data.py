@@ -56,12 +56,14 @@ def get_script_nodes():
 		html = BeautifulSoup(raw_html, 'html.parser')
 		script_nodes = html.select('script')
 		script_text.append(str(script_nodes[pos]))
+		print("Grabbed {0} data...".format(y))
 	return script_text
 
 def write_player_df(script_text):
 	''' Function to write a data frame containing player information
 	@param List script_text: A list containing the pertinent javascript
 	'''
+	print("Writing player information data frame...")
 	player_data_frames = []
 	for s in script_text:
 		player_text = re.findall(r'{"personId"(.*?)}', s)
@@ -83,9 +85,25 @@ def write_player_df(script_text):
 		player_data_concat = player_data_concat[player_data_concat['grade'] != 'null']
 		player_data_concat['grade'] = pd.to_numeric(player_data_concat['grade'])
 		#player_data_concat.loc(player_data_concat['year'] < 2014, ["grade"]) = player_data_concat.loc[x['year'] < 2014, ["grade"]]/10
+	
 	return player_data_concat
 
 def get_player_text(player_data):
 	''' Function to get the player textual data
 	@param DataFrame player_data: A data frame containing basic player info like ids and year
 	'''
+	for index, row in player_data.iterrows():
+		print("Retrieving data for {0} {1} in {3}...".format(player_fn, player_ln, player_year))
+		player_year = row['year']
+		player_fn = row['first_name']
+		player_ln = row['last_name']
+		player_id = row['player_id']
+		url = "http://www.nfl.com/draft/{0}/profiles/{1}-{2}?id={3}".format(player_year, player_fn, player_ln, player_id)
+		raw_html = get_page(url)
+		html = BeautifulSoup(raw_html, 'html.parser')
+		article_nodes = html.select('article')	
+	return article_nodes
+
+script_nodes = get_script_nodes()
+player_data = write_player_df(script_nodes)
+test = get_player_text(player_data)
