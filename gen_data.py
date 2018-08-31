@@ -65,8 +65,10 @@ def write_player_df(script_text):
 	player_data_frames = []
 	for s in script_text:
 		player_text = re.findall(r'{"personId"(.*?)}', s)
-		playerId, firstName, lastName, hasAnalysis, pos, expertGrade, pick = [], [], [], [], [], [], []
+		year, playerId, firstName, lastName, hasAnalysis, pos, expertGrade, pick = [], [], [], [], [], [], [], []
 		for p in player_text:
+			year_pre = re.findall(r'nfl.global.dt.year(.*)', s)[0]
+			year.append(int(re.findall(r'\'(.*)\'', year_pre)[0]))
 			playerId.append(re.findall(r':(.*?),' ,p)[0])
 			firstName.append(re.findall(r'"firstName":"(.*?)",' ,p)[0])
 			lastName.append(re.findall(r'"lastName":"(.*?)",' ,p)[0])
@@ -74,7 +76,16 @@ def write_player_df(script_text):
 			pos.append(re.findall(r'"pos":"(.*?)",' ,p)[0])
 			expertGrade.append(re.findall(r'"expertGrade":(.*?),' ,p)[0])
 			pick.append(re.findall(r'"pick":(.*?),' ,p)[0])
-		player_dict = {"player_id": playerId, "first_name": firstName, "last_name": lastName, "hasAnalysis": hasAnalysis, "position": pos ,"grade": expertGrade, "pick": pick}
+		player_dict = {"year": year, "player_id": playerId, "first_name": firstName, "last_name": lastName, "hasAnalysis": hasAnalysis, "position": pos ,"grade": expertGrade, "pick": pick}
 		player_data_frames.append(pd.DataFrame.from_dict(player_dict))
-	return player_data_frames
+		player_data_concat = pd.concat(player_data_frames)
+		player_data_concat = player_data_concat[player_data_concat['hasAnalysis'] == 'true']
+		player_data_concat = player_data_concat[player_data_concat['grade'] != 'null']
+		player_data_concat['grade'] = pd.to_numeric(player_data_concat['grade'])
+		#player_data_concat.loc(player_data_concat['year'] < 2014, ["grade"]) = player_data_concat.loc[x['year'] < 2014, ["grade"]]/10
+	return player_data_concat
 
+def get_player_text(player_data):
+	''' Function to get the player textual data
+	@param DataFrame player_data: A data frame containing basic player info like ids and year
+	'''
