@@ -107,7 +107,7 @@ def get_player_text(player_data):
 		strengths.append(re.findall(r'</h4>(.*)',article_nodes[0]))
 		weaknesses.append(re.findall(r'</h4>(.*)',article_nodes[1]))
 	player_data['strengths'] = strengths
-	palyer_data['weaknesses'] = weaknesses
+	player_data['weaknesses'] = weaknesses
 	return player_data
 
 script_nodes = get_script_nodes()
