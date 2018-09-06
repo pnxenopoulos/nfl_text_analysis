@@ -112,4 +112,4 @@ def get_player_text(player_data):
 
 script_nodes = get_script_nodes()
 player_data = write_player_df(script_nodes)
-player_data = get_player_text(player_data)
+test = get_player_text(player_data)
